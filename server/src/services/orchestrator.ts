@@ -1,12 +1,16 @@
 import { GoogleGenAI } from "@google/genai"
 import { config } from "@/utils/config.js"
 import { createSandbox } from "./sandbox.js"
-import { generatePodcastScriptTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
+import { generatePodcastScriptTool, generateVoiceTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
 import { searchWeb } from "./web-search.js"
 import { generatePodcastScript } from "./script_generator.js"
+import { generatePodcastAudio } from "./voice-generator.js"
+import { emitFileEvent } from "@/utils/util.js"
 
 export class Orchestrator {
   private ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
+
+ 
 
   // Stub event system preserved for compatibility with /api/task route
   on(_event: string, _callback: (...args: any[]) => void) {
@@ -18,6 +22,11 @@ export class Orchestrator {
     return ["Analyze Task", "Search News", "Generate Script"]
   }
 
+  safePreview = (v: any, max = 400) => {
+    const s = typeof v === "string" ? v : JSON.stringify(v)
+    return s.length > max ? s.slice(0, max) + "..." : s
+  }
+  
   /**
    * One-call streaming orchestration with function-calling.
    * Supports multiple tool calls in sequence (search → python → finalize).
@@ -30,7 +39,12 @@ export class Orchestrator {
 
     // Running conversation state
     const contents: any[] = [{ role: "user", parts: [{ text: prompt }] }]
-    const tools = [{ functionDeclarations: [runPythonTool, searchWebTool, generatePodcastScriptTool] }]
+    const tools = [{ functionDeclarations: [
+      runPythonTool, 
+      searchWebTool, 
+      generatePodcastScriptTool,
+      generateVoiceTool
+    ] }]
 
     log?.(`[STEP] Sending prompt to Gemini...`)
     let response = await this.ai.models.generateContent({
@@ -51,7 +65,8 @@ export class Orchestrator {
 
       // Handle the tool call
       log?.(`[FUNC] ${fn.name}`)
-      log?.(`[ARGS] ${JSON.stringify(fn.args, null, 2)}`)
+      log?.(`[ARGS] ${this.safePreview(fn.args, 400)}`)
+
 
       if (fn.name === "run_python_in_sandbox") {
         const code = (fn.args as Record<string, any>).code
@@ -79,6 +94,7 @@ export class Orchestrator {
         try {
           const result = await searchWeb(query, { max_results })
           // log?.(`[SEARCH_RESULT] ${JSON.stringify(result).slice(0, 800)}...`)
+          
           opts?.onLog?.(`[FILE] {"tool":"search_web","filename":"search_result.json","content":${JSON.stringify(result)}}`)
 
 
@@ -131,7 +147,34 @@ export class Orchestrator {
           if (candidateContent) contents.push(candidateContent)
           contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
         }
-      }      
+      } else if (fn.name === "generate_voice") {
+        const { script, voice } = fn.args as Record<string, any>
+        log?.(`[VOICE] Generating podcast audio using ElevenLabs...`)
+      
+        try {
+          const result = await generatePodcastAudio(script)
+          log?.(`[VOICE_DONE] Audio generated (${result.filePath})`)
+      
+          // Stream audio file to the frontend only (NOT into Gemini context)
+          emitFileEvent(opts!, "generate_voice", "podcast_audio.mp3", result.urlPath)
+          
+          // Minimal functionResponse back to Gemini (NO base64)
+          const functionResponsePart = {
+            name: fn.name,
+            response: {
+              success: true,
+              message: result.message,
+              filename: "podcast_audio.mp3",
+            },
+          }
+          const candidateContent = response.candidates?.[0]?.content
+          if (candidateContent) contents.push(candidateContent)
+          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+        } catch (err: any) {
+          log?.(`[ERROR] generate_voice: ${err?.message || String(err)}`)
+        }
+      }
+         
       else {
         log?.(`[ERROR] Unknown function call: ${fn.name}`)
         const functionResponsePart = {

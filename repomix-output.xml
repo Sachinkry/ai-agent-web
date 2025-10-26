@@ -49,6 +49,7 @@ frontend/
     components/
       ui/
         button.tsx
+        dialog.tsx
       ChatInterface.tsx
       SandboxPanel.tsx
     hooks/
@@ -71,6 +72,27 @@ frontend/
   tsconfig.node.json
   vite.config.ts
 server/
+  server/
+    tmp/
+      podcast_1761486069564.mp3
+      podcast_1761486246477.mp3
+      podcast_1761486279962.mp3
+      podcast_1761486390040.mp3
+      podcast_1761486418803.mp3
+      podcast_1761486579549.mp3
+      podcast_1761486613467.mp3
+      podcast_1761486680755.mp3
+      podcast_1761486706872.mp3
+      podcast_1761486774938.mp3
+      podcast_1761487985128.mp3
+      podcast_1761488070831.mp3
+      podcast_1761488592965.mp3
+      podcast_1761488777007.mp3
+      podcast_1761488923308.mp3
+      podcast_1761488960401.mp3
+      podcast_1761489196357.mp3
+      podcast_1761489530367.mp3
+      podcast_1761489583982.mp3
   src/
     routes/
       geminiFn.ts
@@ -78,11 +100,11 @@ server/
       logs.ts
       podcast.ts
     services/
-      elevenlabs.ts
       gemini-tools.ts
       orchestrator.ts
       sandbox.ts
       script_generator.ts
+      voice-generator.ts
       web-search.ts
     tests/
       health.test.ts
@@ -90,6 +112,7 @@ server/
       config.ts
       logger.ts
       types.ts
+      util.ts
     .env.example
     index.ts
   .gitignore
@@ -103,6 +126,226 @@ README.md
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="frontend/src/components/ui/dialog.tsx">
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { XIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+function Dialog({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+}
+
+function DialogTrigger({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+}
+
+function DialogPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+}
+
+function DialogClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
+
+function DialogOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogContent({
+  className,
+  children,
+  showCloseButton = true,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  showCloseButton?: boolean
+}) {
+  return (
+    <DialogPortal data-slot="dialog-portal">
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {showCloseButton && (
+          <DialogPrimitive.Close
+            data-slot="dialog-close"
+            className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+          >
+            <XIcon />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+}
+
+function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn(
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn("text-lg leading-none font-semibold", className)}
+      {...props}
+    />
+  )
+}
+
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  )
+}
+
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+}
+</file>
+
+<file path="server/src/services/voice-generator.ts">
+import { config } from "@/utils/config.js"
+import fs from "fs"
+import path from "path"
+
+/**
+ * Generates speech using ElevenLabs API.
+ * Returns the local file path and base64 string.
+ */
+export async function generatePodcastAudio(script: string) {
+  if (!config.ELEVENLABS_API_KEY) {
+    console.warn("[voice] Missing ELEVENLABS_API_KEY – returning mock audio")
+    return {
+      filePath: "mock_podcast.mp3",
+      base64: "",
+      message: "Mock audio (no key set)",
+    }
+  }
+
+  const outputDir = path.join(process.cwd(), "server", "tmp")
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true })
+
+  const outputFile = path.join(outputDir, `podcast_${Date.now()}.mp3`)
+
+  const voiceId = "JBFqnCBsd6RMkjVDRZzb" // You can parameterize this later
+
+  const res = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": config.ELEVENLABS_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: script,
+        voice_settings: { stability: 0.4, similarity_boost: 0.9 },
+        model_id: "eleven_multilingual_v2",
+      }),
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`ElevenLabs TTS failed: ${text}`)
+  }
+
+  const arrayBuffer = await res.arrayBuffer()
+  const buffer = Buffer.from(arrayBuffer)
+  fs.writeFileSync(outputFile, buffer)
+
+  const base64 = buffer.toString("base64")
+
+  return {
+    filePath: outputFile,
+    base64,
+    message: "Audio generated successfully",
+  }
+}
+</file>
+
+<file path="server/src/utils/util.ts">
+export function emitFileEvent(opts: { onLog?: (msg: string) => void }, tool: string, filename: string, content: string) {
+    try {
+      const payload = { tool, filename, content }
+      const json = `[FILE] ${JSON.stringify(payload)}`
+      // ✅ Send to frontend
+      opts.onLog?.(json)
+      // ✅ Also confirm in backend console (shortened)
+      console.log(`[DEBUG_EMIT_FILE] ${filename} emitted (${content.slice(0, 50)}...)`)
+    } catch (err) {
+      console.error("[emitFileEvent] Failed to emit file event:", err)
+    }
+  }
+</file>
 
 <file path="frontend/public/vite.svg">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
@@ -241,14 +484,13 @@ import { useState } from "react"
 export function useGeminiAgent() {
   const [logs, setLogs] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const [sandboxUrl, setSandboxUrl] = useState<string | null>(null)
   const [files, setFiles] = useState<{ tool: string; filename: string; content: string }[]>([])
 
 
   async function runTask(prompt: string) {
     setLogs([])
-    setSandboxUrl(null)
     setLoading(true)
+    setFiles([])
 
     const res = await fetch("/api/gemini-fn", {
       method: "POST",
@@ -267,22 +509,32 @@ export function useGeminiAgent() {
       const chunk = decoder.decode(value)
       chunk.split("\n").forEach((line) => {
         if (!line.trim()) return
+        const clean = line.trim()
 
-        if (line.startsWith("[FILE]")) {
+        if (line.trim().startsWith("[FILE]")) {
+            const raw = line.trim().replace("[FILE]", "").trim()
             try {
-              const json = JSON.parse(line.replace("[FILE] ", ""))
-              setFiles((prev) => [...prev, json])
+              const parsed = JSON.parse(raw)
+              if (parsed.filename && parsed.content) {
+                console.log("[UI_DEBUG] Parsed FILE event:", parsed.filename)
+                setFiles((prev) => [
+                  ...prev.filter((f) => f.filename !== parsed.filename),
+                  parsed,
+                ])
+              }
             } catch (err) {
-              console.error("Bad FILE line:", line, err)
+              console.error("[UI_DEBUG] Bad FILE JSON line:", raw.slice(0, 200), err)
             }
-            return
-          }
+            return // Do not push to logs
+        }
+          
+
+        if (clean.includes("data:audio/mpeg;base64")) return
         
 
         setLogs((prev) => [...prev, line])
       })
     }
-
     setLoading(false)
   }
 
@@ -390,100 +642,95 @@ export function cn(...inputs: ClassValue[]) {
 import { useGeminiAgent } from "./hooks/useGeminiAgent"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function App() {
   const { logs, loading, runTask, files } = useGeminiAgent()
   const [prompt, setPrompt] = useState("")
-  const [activeFile, setActiveFile] = useState<string | null>(null)
-
-  // Split Gemini logs and sandbox logs
-  const sandboxLogs = logs.filter((l) => l.includes("[E2B_RESULT]") || l.includes("stdout"))
-  const chatLogs = logs.filter((l) => !sandboxLogs.includes(l))
+  const [selectedFile, setSelectedFile] = useState<{
+    filename: string
+    content: string
+  } | null>(null)
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="p-4 border-b border-border text-center font-bold text-xl">
-        🔮 Tiny Runnable AI Agent
-      </header>
+    <div className="flex flex-col items-center h-screen p-8 space-y-4 bg-neutral-950 text-neutral-100">
+      <h1 className="text-2xl font-bold">🔮 Tiny Runnable AI Agent</h1>
 
-      <main className="flex flex-1 flex-col md:flex-row  ">
-        {/* Chat Section */}
-        <div className="flex flex-col w-full  border-r border-border p-4 space-y-4">
-          <h2 className="text-lg font-semibold">💬 Chat</h2>
+      {/* Input Bar */}
+      <div className="flex w-full max-w-3xl space-x-2">
+        <input
+          className="flex-1 border border-neutral-700 bg-neutral-900 rounded px-3 py-2 text-neutral-100"
+          placeholder="Ask Gemini to search or create a podcast..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && runTask(prompt)}
+        />
+        <Button className="bg-rose-500" disabled={loading} onClick={() => runTask(prompt)}>
+          {loading ? "Running..." : "Run"}
+        </Button>
+      </div>
 
-          <div className="flex space-x-2">
-            <input
-              className="flex-1 border rounded px-3 py-2"
-              placeholder="Ask Gemini to run code..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && runTask(prompt)}
-            />
-            <Button disabled={loading} onClick={() => runTask(prompt)}>
-              {loading ? "Running..." : "Run"}
-            </Button>
+      {/* File List */}
+      {files.length > 0 && (
+        <div
+          className="w-full max-w-3xl border border-neutral-700 rounded-md  bg-neutral-900"
+          // style={{ maxHeight: "70vh", overflowY: "auto" }}
+        >
+          <div className="border-b border-neutral-700 bg-neutral-800 text-sm sticky top-0">
+            <div className="p-2 text-neutral-300 font-semibold">Files</div>
           </div>
 
-          
-
-          <div className="bg-black text-green-400 font-mono p-3 rounded-lg flex-1 overflow-y-auto whitespace-pre-wrap">
-            {chatLogs.length === 0 && (
-              <div className="opacity-50 text-sm">No logs yet. Try running a prompt.</div>
-            )}
-            {chatLogs.map((log, i) => (
-              <div key={i}>{log}</div>
+          <div className="divide-y divide-neutral-800">
+            {files.map((f) => (
+              <Dialog key={f.filename}>
+                <DialogTrigger asChild>
+                  <button
+                    onClick={() => setSelectedFile(f)}
+                    className="w-full text-left px-4 py-2 hover:bg-neutral-800 transition-colors"
+                  >
+                    <span className="text-blue-400">{f.filename}</span>
+                    <span className="text-neutral-500 text-xs ml-2">
+                      ({f.tool})
+                    </span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-neutral-950 text-neutral-100 border-neutral-700">
+                  <DialogHeader>
+                    <DialogTitle>{f.filename}</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-2 font-mono text-xs whitespace-pre-wrap bg-neutral-900 border border-neutral-800 p-3 rounded-md">
+                  {f.filename.endsWith(".mp3") ? (
+                      <audio controls src={f.content} className="w-full mt-2" />
+                    ) : f.filename.endsWith(".json") ? (
+                      JSON.stringify(f.content, null, 2)
+                    ) : (
+                      f.content
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
             ))}
           </div>
         </div>
+      )}
 
-        {/* Sandbox Section */}
-        {/* <div className="flex flex-col w-full md:w-2/5 p-4">
-          <h2 className="text-lg font-semibold mb-2">🧩 Sandbox Output</h2>
-
-          <div className="bg-zinc-900 text-blue-300 font-mono p-3 rounded-lg flex-1 overflow-y-auto whitespace-pre-wrap">
-            {sandboxLogs.length === 0 && (
-              <div className="opacity-50 text-sm">No sandbox output yet.</div>
-            )}
-            {sandboxLogs.map((log, i) => (
-              <div key={i}>{log}</div>
-            ))}
-          </div>
-        </div> */}
-        {files.length > 0 && (
-          <div className="w-full max-w-xl border rounded-md overflow-hidden bg-neutral-900 text-white">
-          <div className="flex border-b border-neutral-700 bg-neutral-800 text-sm">
-            {files.map((f, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveFile(f.filename)}
-                className={`px-3 py-2 hover:bg-neutral-700 ${
-                  activeFile === f.filename ? "bg-neutral-700 font-bold" : ""
-                }`}
-              >
-                {f.filename}
-              </button>
-            ))}
-          </div>
-
-          <div className="p-3 font-mono text-xs h-64 overflow-y-auto whitespace-pre-wrap">
-            {activeFile
-              ? (() => {
-                  const file = files.find((f) => f.filename === activeFile)
-                  if (!file) return "No file selected"
-                  try {
-                    return file.filename.endsWith(".json")
-                      ? JSON.stringify(file.content, null, 2)
-                      : file.content
-                  } catch {
-                    return String(file.content)
-                  }
-                })()
-              : "Select a file to view its contents."}
-          </div>
-        </div>
-
-        )}
-      </main>
+      {/* Logs Terminal */}
+      <div
+        className="bg-black text-green-400 font-mono p-4 rounded-lg w-full max-w-3xl overflow-y-auto whitespace-pre-wrap border border-neutral-800"
+        style={{ maxHeight: "70vh" }}
+      > {!logs || logs.length === 0 ? (
+        <div className="text-green-500">Sandbox. Logs will appear here...</div>
+      ) : ""}
+        {logs && logs.map((log, i) => (
+          <div className="text-wrap" key={i}>{log.length > 1000 ? log.slice(0, 1000) + '…' : log}</div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -734,6 +981,7 @@ export default defineConfig([
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/vite": "^4.1.16",
     "class-variance-authority": "^0.7.1",
@@ -1086,15 +1334,37 @@ export const generatePodcastScriptTool = {
       required: ["topic", "news_data"],
     },
   }
+  
+  export const generateVoiceTool = {
+    name: "generate_voice",
+    description:
+      "Converts the podcast script into spoken audio using ElevenLabs text-to-speech.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        script: {
+          type: Type.STRING,
+          description: "Podcast script text to convert to speech",
+        },
+        voice: {
+          type: Type.STRING,
+          description: "Voice name or ID to use (default: Rachel)",
+        },
+      },
+      required: ["script"],
+    },
+  }
 </file>
 
 <file path="server/src/services/orchestrator.ts">
 import { GoogleGenAI } from "@google/genai"
 import { config } from "@/utils/config.js"
 import { createSandbox } from "./sandbox.js"
-import { generatePodcastScriptTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
+import { generatePodcastScriptTool, generateVoiceTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
 import { searchWeb } from "./web-search.js"
 import { generatePodcastScript } from "./script_generator.js"
+import { generatePodcastAudio } from "./voice-generator.js"
+import { emitFileEvent } from "@/utils/util.js"
 
 export class Orchestrator {
   private ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
@@ -1109,6 +1379,11 @@ export class Orchestrator {
     return ["Analyze Task", "Search News", "Generate Script"]
   }
 
+  safePreview = (v: any, max = 400) => {
+    const s = typeof v === "string" ? v : JSON.stringify(v)
+    return s.length > max ? s.slice(0, max) + "..." : s
+  }
+  
   /**
    * One-call streaming orchestration with function-calling.
    * Supports multiple tool calls in sequence (search → python → finalize).
@@ -1121,7 +1396,12 @@ export class Orchestrator {
 
     // Running conversation state
     const contents: any[] = [{ role: "user", parts: [{ text: prompt }] }]
-    const tools = [{ functionDeclarations: [runPythonTool, searchWebTool, generatePodcastScriptTool] }]
+    const tools = [{ functionDeclarations: [
+      runPythonTool, 
+      searchWebTool, 
+      generatePodcastScriptTool,
+      generateVoiceTool
+    ] }]
 
     log?.(`[STEP] Sending prompt to Gemini...`)
     let response = await this.ai.models.generateContent({
@@ -1142,7 +1422,8 @@ export class Orchestrator {
 
       // Handle the tool call
       log?.(`[FUNC] ${fn.name}`)
-      log?.(`[ARGS] ${JSON.stringify(fn.args, null, 2)}`)
+      log?.(`[ARGS] ${this.safePreview(fn.args, 400)}`)
+
 
       if (fn.name === "run_python_in_sandbox") {
         const code = (fn.args as Record<string, any>).code
@@ -1170,6 +1451,7 @@ export class Orchestrator {
         try {
           const result = await searchWeb(query, { max_results })
           // log?.(`[SEARCH_RESULT] ${JSON.stringify(result).slice(0, 800)}...`)
+          
           opts?.onLog?.(`[FILE] {"tool":"search_web","filename":"search_result.json","content":${JSON.stringify(result)}}`)
 
 
@@ -1222,7 +1504,37 @@ export class Orchestrator {
           if (candidateContent) contents.push(candidateContent)
           contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
         }
-      }      
+      } else if (fn.name === "generate_voice") {
+        const { script, voice } = fn.args as Record<string, any>
+        log?.(`[VOICE] Generating podcast audio using ElevenLabs...`)
+      
+        try {
+          const result = await generatePodcastAudio(script)
+          log?.(`[VOICE_DONE] Audio generated (${result.filePath})`)
+      
+          // Stream audio file to the frontend only (NOT into Gemini context)
+          const base64Prefix = "data:audio/mpeg;base64,"
+          // if (opts) {
+            emitFileEvent(opts!, "generate_voice", "podcast_audio.mp3", `${base64Prefix}${result.base64}`)
+          // }
+          
+          // Minimal functionResponse back to Gemini (NO base64)
+          const functionResponsePart = {
+            name: fn.name,
+            response: {
+              success: true,
+              message: result.message,
+              filename: "podcast_audio.mp3",
+            },
+          }
+          const candidateContent = response.candidates?.[0]?.content
+          if (candidateContent) contents.push(candidateContent)
+          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+        } catch (err: any) {
+          log?.(`[ERROR] generate_voice: ${err?.message || String(err)}`)
+        }
+      }
+         
       else {
         log?.(`[ERROR] Unknown function call: ${fn.name}`)
         const functionResponsePart = {

@@ -54,3 +54,23 @@ export const generatePodcastScriptTool = {
     },
   }
   
+  export const generateVoiceTool = {
+    name: "generate_voice",
+    description:
+      "Converts the podcast script into spoken audio using ElevenLabs text-to-speech.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        script: {
+          type: Type.STRING,
+          description: "Podcast script text to convert to speech",
+        },
+        voice: {
+          type: Type.STRING,
+          description: "Voice name or ID to use (default: Rachel)",
+        },
+      },
+      required: ["script"],
+    },
+  }
+  
