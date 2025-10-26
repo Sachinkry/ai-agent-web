@@ -40,12 +40,6 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
-agents/
-  orchestrator.ts
-  sandboxClient.ts
-  scriptAgent.ts
-  searchAgent.ts
-  voiceAgent.ts
 frontend/
   public/
     vite.svg
@@ -55,6 +49,8 @@ frontend/
     components/
       ui/
         button.tsx
+      ChatInterface.tsx
+      SandboxPanel.tsx
     hooks/
       useGeminiAgent.ts
       useOrchestrator.ts
@@ -86,80 +82,27 @@ server/
       gemini-tools.ts
       orchestrator.ts
       sandbox.ts
+      script_generator.ts
+      web-search.ts
     tests/
       health.test.ts
     utils/
       config.ts
       logger.ts
       types.ts
+    .env.example
     index.ts
-  .env
   .gitignore
   package.json
   tsconfig.json
 shared/
   types.ts
   utils.ts
+README.md
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
-
-<file path="agents/orchestrator.ts">
-import { searchNews } from './searchAgent'
-import { generateScript } from './scriptAgent'
-import { synthesizeVoice } from './voiceAgent'
-
-export async function createPodcast(topic: string) {
-  const news = await searchNews(topic)
-  const script = await generateScript(news.stdout)
-  const audio = await synthesizeVoice(script)
-  return { script, audio }
-}
-</file>
-
-<file path="agents/sandboxClient.ts">
-import E2B from '@e2b/sdk'
-
-export async function runInSandbox(code: string) {
-  const sandbox = await E2B.Sandbox.create({ template: 'python3' })
-  const { stdout, stderr } = await sandbox.runCode(code)
-  await sandbox.close()
-  return { stdout, stderr }
-}
-</file>
-
-<file path="agents/scriptAgent.ts">
-import { geminiFlash } from '../lib/gemini'
-
-export async function generateScript(newsData: string) {
-  return geminiFlash(`
-    Write a podcast script with 2 speakers discussing:
-    ${newsData}
-  `)
-}
-</file>
-
-<file path="agents/searchAgent.ts">
-import { runInSandbox } from './sandboxClient'
-
-export async function searchNews(topic: string) {
-  const code = `
-  import requests, json
-  # call Tavily API here and print results
-  `
-  return runInSandbox(code)
-}
-</file>
-
-<file path="agents/voiceAgent.ts">
-import { elevenlabs } from '../lib/voice'
-
-export async function synthesizeVoice(script: string) {
-  const voices = ['Rachel', 'Elli']
-  return elevenlabs.generate({ script, voices })
-}
-</file>
 
 <file path="frontend/public/vite.svg">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
@@ -232,6 +175,66 @@ function Button({
 export { Button, buttonVariants }
 </file>
 
+<file path="frontend/src/components/ChatInterface.tsx">
+import { useState } from "react"
+import { Button } from "./ui/button"
+
+export default function ChatInterface({ logs, loading, onSubmit }: any) {
+    const [prompt, setPrompt] = useState("")
+  
+    return (
+      <>
+        <h1 className="text-2xl font-bold">🔮 Gemini Sandbox</h1>
+  
+        <div className="flex-1 overflow-y-auto space-y-3 rounded-lg p-4 bg-zinc-100 dark:bg-zinc-900 border">
+          {logs.map((log: string, i: number) => (
+            <div
+              key={i}
+              className={`p-2 rounded-md ${
+                log.startsWith("[LOG]") || log.startsWith("[STEP]")
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200"
+                  : log.startsWith("[E2B_RESULT]")
+                  ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
+                  : "bg-gray-50 dark:bg-gray-800"
+              }`}
+            >
+              {log.replace(/^\[(.*?)\]\s*/, "")}
+            </div>
+          ))}
+        </div>
+  
+        <div className="flex space-x-2 mt-4">
+          <input
+            className="flex-1 border rounded px-3 py-2"
+            placeholder="Ask Gemini to run code..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && onSubmit(prompt)}
+          />
+          <Button disabled={loading} onClick={() => onSubmit(prompt)}>
+            {loading ? "Running..." : "Run"}
+          </Button>
+        </div>
+      </>
+    )
+  }
+</file>
+
+<file path="frontend/src/components/SandboxPanel.tsx">
+export default function SandboxPanel({ logs }: any) {
+    return (
+      <div className="flex flex-col h-full">
+        <h2 className="text-lg font-semibold mb-2">🧠 Sandbox Runtime</h2>
+        <div className="flex-1 overflow-y-auto bg-black text-green-400 font-mono p-4 rounded">
+          {logs.map((log: string, i: number) => (
+            <div key={i}>{log}</div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+</file>
+
 <file path="frontend/src/hooks/useGeminiAgent.ts">
 import { useState } from "react"
 
@@ -239,6 +242,8 @@ export function useGeminiAgent() {
   const [logs, setLogs] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [sandboxUrl, setSandboxUrl] = useState<string | null>(null)
+  const [files, setFiles] = useState<{ tool: string; filename: string; content: string }[]>([])
+
 
   async function runTask(prompt: string) {
     setLogs([])
@@ -263,10 +268,16 @@ export function useGeminiAgent() {
       chunk.split("\n").forEach((line) => {
         if (!line.trim()) return
 
-        if (line.includes("E2B Sandbox started:")) {
-          const url = line.split("E2B Sandbox started:")[1].trim()
-          if (url.startsWith("http")) setSandboxUrl(url)
-        }
+        if (line.startsWith("[FILE]")) {
+            try {
+              const json = JSON.parse(line.replace("[FILE] ", ""))
+              setFiles((prev) => [...prev, json])
+            } catch (err) {
+              console.error("Bad FILE line:", line, err)
+            }
+            return
+          }
+        
 
         setLogs((prev) => [...prev, line])
       })
@@ -275,7 +286,7 @@ export function useGeminiAgent() {
     setLoading(false)
   }
 
-  return { logs, loading, sandboxUrl, runTask }
+  return { logs, loading, runTask, files }
 }
 </file>
 
@@ -381,42 +392,98 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
 export default function App() {
-  const { logs, loading, sandboxUrl, runTask } = useGeminiAgent()
+  const { logs, loading, runTask, files } = useGeminiAgent()
   const [prompt, setPrompt] = useState("")
+  const [activeFile, setActiveFile] = useState<string | null>(null)
+
+  // Split Gemini logs and sandbox logs
+  const sandboxLogs = logs.filter((l) => l.includes("[E2B_RESULT]") || l.includes("stdout"))
+  const chatLogs = logs.filter((l) => !sandboxLogs.includes(l))
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-8 space-y-4">
-      <h1 className="text-2xl font-bold">🔮 Tiny Runable AI Agent</h1>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <header className="p-4 border-b border-border text-center font-bold text-xl">
+        🔮 Tiny Runnable AI Agent
+      </header>
 
-      <div className="flex w-full max-w-xl space-x-2">
-        <input
-          className="flex-1 border rounded px-3 py-2"
-          placeholder="Ask Gemini to run code..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && runTask(prompt)}
-        />
-        <Button disabled={loading} onClick={() => runTask(prompt)}>
-          {loading ? "Running..." : "Run"}
-        </Button>
-      </div>
+      <main className="flex flex-1 flex-col md:flex-row  ">
+        {/* Chat Section */}
+        <div className="flex flex-col w-full  border-r border-border p-4 space-y-4">
+          <h2 className="text-lg font-semibold">💬 Chat</h2>
 
-      <div className="bg-black text-green-400 font-mono p-4 rounded-lg w-full max-w-xl h-96 overflow-y-auto whitespace-pre-wrap">
-        {logs.map((log, i) => (
-          <div key={i}>{log}</div>
-        ))}
-      </div>
+          <div className="flex space-x-2">
+            <input
+              className="flex-1 border rounded px-3 py-2"
+              placeholder="Ask Gemini to run code..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && runTask(prompt)}
+            />
+            <Button disabled={loading} onClick={() => runTask(prompt)}>
+              {loading ? "Running..." : "Run"}
+            </Button>
+          </div>
 
-      {sandboxUrl && (
-        <a
-          href={sandboxUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="text-blue-400 underline"
-        >
-          Open E2B Sandbox Session
-        </a>
-      )}
+          
+
+          <div className="bg-black text-green-400 font-mono p-3 rounded-lg flex-1 overflow-y-auto whitespace-pre-wrap">
+            {chatLogs.length === 0 && (
+              <div className="opacity-50 text-sm">No logs yet. Try running a prompt.</div>
+            )}
+            {chatLogs.map((log, i) => (
+              <div key={i}>{log}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sandbox Section */}
+        {/* <div className="flex flex-col w-full md:w-2/5 p-4">
+          <h2 className="text-lg font-semibold mb-2">🧩 Sandbox Output</h2>
+
+          <div className="bg-zinc-900 text-blue-300 font-mono p-3 rounded-lg flex-1 overflow-y-auto whitespace-pre-wrap">
+            {sandboxLogs.length === 0 && (
+              <div className="opacity-50 text-sm">No sandbox output yet.</div>
+            )}
+            {sandboxLogs.map((log, i) => (
+              <div key={i}>{log}</div>
+            ))}
+          </div>
+        </div> */}
+        {files.length > 0 && (
+          <div className="w-full max-w-xl border rounded-md overflow-hidden bg-neutral-900 text-white">
+          <div className="flex border-b border-neutral-700 bg-neutral-800 text-sm">
+            {files.map((f, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveFile(f.filename)}
+                className={`px-3 py-2 hover:bg-neutral-700 ${
+                  activeFile === f.filename ? "bg-neutral-700 font-bold" : ""
+                }`}
+              >
+                {f.filename}
+              </button>
+            ))}
+          </div>
+
+          <div className="p-3 font-mono text-xs h-64 overflow-y-auto whitespace-pre-wrap">
+            {activeFile
+              ? (() => {
+                  const file = files.find((f) => f.filename === activeFile)
+                  if (!file) return "No file selected"
+                  try {
+                    return file.filename.endsWith(".json")
+                      ? JSON.stringify(file.content, null, 2)
+                      : file.content
+                  } catch {
+                    return String(file.content)
+                  }
+                })()
+              : "Select a file to view its contents."}
+          </div>
+        </div>
+
+        )}
+      </main>
     </div>
   )
 }
@@ -567,7 +634,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
+.env.local
+.env.*.local
+.env
 node_modules
 dist
 dist-ssr
@@ -979,89 +1048,203 @@ export const runPythonTool = {
     required: ["code"],
   },
 }
+
+export const searchWebTool = {
+  name: "search_web",
+  description:
+    "Search the live web for recent info. Use for news, updates, or when the user asks for 'latest'. Returns concise results.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: { type: Type.STRING, description: "Search query string" },
+      max_results: {
+        type: Type.NUMBER,
+        description: "Max number of results (1-10)",
+      },
+    },
+    required: ["query"],
+  },
+}
+
+export const generatePodcastScriptTool = {
+    name: "generate_podcast_script",
+    description:
+      "Takes recent news search results and writes an engaging 5-10 minute podcast script with 2 speakers.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        topic: {
+          type: Type.STRING,
+          description: "The main topic or theme of the podcast",
+        },
+        news_data: {
+          type: Type.STRING,
+          description:
+            "Concatenated or summarized news articles from the web search",
+        },
+      },
+      required: ["topic", "news_data"],
+    },
+  }
 </file>
 
 <file path="server/src/services/orchestrator.ts">
-import { GoogleGenAI, Type } from "@google/genai"
+import { GoogleGenAI } from "@google/genai"
 import { config } from "@/utils/config.js"
 import { createSandbox } from "./sandbox.js"
-import { runPythonTool } from "./gemini-tools.js"
+import { generatePodcastScriptTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
+import { searchWeb } from "./web-search.js"
+import { generatePodcastScript } from "./script_generator.js"
 
 export class Orchestrator {
   private ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
 
-  on(event: string, callback: (...args: any[]) => void) {
-    console.log(`[on] Event registered: ${event}`)
+  // Stub event system preserved for compatibility with /api/task route
+  on(_event: string, _callback: (...args: any[]) => void) {
+    // no-op; you can implement EventEmitter if needed later
   }
-  
+
   async plan(prompt: string) {
-    console.log(`[plan] Stub for planning: ${prompt}`)
+    // Keep your stub plan
     return ["Analyze Task", "Search News", "Generate Script"]
   }
-  
 
+  /**
+   * One-call streaming orchestration with function-calling.
+   * Supports multiple tool calls in sequence (search → python → finalize).
+   */
   async executeWithFunctionCalling(
     prompt: string,
     opts?: { onLog?: (msg: string) => void }
   ) {
     const log = (m: string) => opts?.onLog?.(m)
-  
-    log(`[STEP] Sending prompt to Gemini...`)
-    const tools = [{ functionDeclarations: [runPythonTool] }]
+
+    // Running conversation state
     const contents: any[] = [{ role: "user", parts: [{ text: prompt }] }]
-  
-    const response = await this.ai.models.generateContent({
+    const tools = [{ functionDeclarations: [runPythonTool, searchWebTool, generatePodcastScriptTool] }]
+
+    log?.(`[STEP] Sending prompt to Gemini...`)
+    let response = await this.ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents,
       config: { tools },
     })
-  
-    if (!response.functionCalls?.length) {
-      log(`[DONE] Gemini text-only response.`)
-      return response.text ?? "(no text)"
-    }
-  
-    const fn = response.functionCalls[0]
-    log(`[FUNC] ${fn.name}`)
-    log(`[ARGS] ${JSON.stringify(fn.args, null, 2)}`)
-  
-    if (fn.name === "run_python_in_sandbox") {
-      const code = (fn.args as Record<string, any>).code
-      log(`[CODE] ${code}`)
-  
-      const sandbox = await createSandbox()
-      log(`[E2B] Sandbox started: ${sandbox.getIDEUrl ?? "(no link)"}`)
-  
-      const result = await sandbox.runCode(code)
-      await sandbox.close()
-  
-      log(`[E2B_RESULT] ${JSON.stringify(result)}`)
-  
-      const functionResponsePart = {
-        name: fn.name,
-        response: { result },
+
+    // Loop to satisfy multiple tool calls if the model wants them
+    for (let safety = 0; safety < 4; safety++) {
+      const fn = response.functionCalls?.[0]
+
+      // No tool call – return text.
+      if (!fn) {
+        log?.(`[DONE] Gemini text-only response.`)
+        return response.text ?? "(no text)"
       }
-  
-      const candidateContent = response.candidates?.[0]?.content
-      if (candidateContent) contents.push(candidateContent)
-  
-      contents.push({
-        role: "user",
-        parts: [{ functionResponse: functionResponsePart } as any],
-      })
-  
-      const final = await this.ai.models.generateContent({
+
+      // Handle the tool call
+      log?.(`[FUNC] ${fn.name}`)
+      log?.(`[ARGS] ${JSON.stringify(fn.args, null, 2)}`)
+
+      if (fn.name === "run_python_in_sandbox") {
+        const code = (fn.args as Record<string, any>).code
+        log?.(`[CODE] ${code}`)
+
+        const sandbox = await createSandbox()
+        log?.(`[E2B] Sandbox started`)
+
+        const result = await sandbox.runCode(code)
+        await sandbox.close()
+        log?.(`[E2B_RESULT] ${JSON.stringify(result)}`)
+
+        // Feed function response back
+        const functionResponsePart = {
+          name: fn.name,
+          response: { result },
+        }
+        const candidateContent = response.candidates?.[0]?.content
+        if (candidateContent) contents.push(candidateContent)
+        contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+
+      } else if (fn.name === "search_web") {
+        const { query, max_results } = fn.args as Record<string, any>
+        log?.(`[SEARCH] ${query}`)
+        try {
+          const result = await searchWeb(query, { max_results })
+          // log?.(`[SEARCH_RESULT] ${JSON.stringify(result).slice(0, 800)}...`)
+          opts?.onLog?.(`[FILE] {"tool":"search_web","filename":"search_result.json","content":${JSON.stringify(result)}}`)
+
+
+          const functionResponsePart = {
+            name: fn.name,
+            response: result,
+          }
+          const candidateContent = response.candidates?.[0]?.content
+          if (candidateContent) contents.push(candidateContent)
+          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+        } catch (err: any) {
+          log?.(`[ERROR] search_web: ${err?.message || String(err)}`)
+          const functionResponsePart = {
+            name: fn.name,
+            response: { error: String(err) },
+          }
+          const candidateContent = response.candidates?.[0]?.content
+          if (candidateContent) contents.push(candidateContent)
+          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+        }
+
+      } else if (fn.name === "generate_podcast_script") {
+        const { topic, news_data } = fn.args as Record<string, any>
+        log?.(`[SCRIPT] Generating podcast for topic: ${topic}`)
+      
+        try {
+          const script = await generatePodcastScript(topic, news_data)
+          // log?.(`[SCRIPT_DONE] Script generated (${script.length} chars)`)
+          opts?.onLog?.(`[FILE] {"tool":"generate_podcast_script","filename":"podcast_script.txt","content":${JSON.stringify(script)}}`)
+
+      
+          const functionResponsePart = {
+            name: fn.name,
+            response: { script },
+          }
+      
+          const candidateContent = response.candidates?.[0]?.content
+          if (candidateContent) contents.push(candidateContent)
+          contents.push({
+            role: "user",
+            parts: [{ functionResponse: functionResponsePart } as any],
+          })
+        } catch (err: any) {
+          log?.(`[ERROR] generate_podcast_script: ${err?.message || String(err)}`)
+          const functionResponsePart = {
+            name: fn.name,
+            response: { error: String(err) },
+          }
+          const candidateContent = response.candidates?.[0]?.content
+          if (candidateContent) contents.push(candidateContent)
+          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+        }
+      }      
+      else {
+        log?.(`[ERROR] Unknown function call: ${fn.name}`)
+        const functionResponsePart = {
+          name: fn.name,
+          response: { error: `Unknown function call: ${fn.name}` },
+        }
+        const candidateContent = response.candidates?.[0]?.content
+        if (candidateContent) contents.push(candidateContent)
+        contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
+      }
+
+      // Ask model to proceed (it may call more tools or produce final text)
+      response = await this.ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents,
         config: { tools },
       })
-  
-      return final.text ?? "(no final.text)"
     }
-  
-    return `Unknown function call: ${fn.name}`
+
+    // Fallback in case of tool loop overflow
+    return response.text ?? "(no final.text)"
   }
-  
 }
 </file>
 
@@ -1077,9 +1260,7 @@ export async function createSandbox() {
         return { stdout: "MOCK_SANDBOX:\n" + code, stderr: "" }
       },
       async close() {},
-      getIDEUrl() {
-        return undefined
-      },
+      
     }
   }
 
@@ -1097,20 +1278,125 @@ export async function createSandbox() {
     async close() {
       // No-op for @e2b/code-interpreter
     },
-    getIDEUrl() {
-      // Code-interpreter doesn’t have IDE sessions
-      return undefined
-    },
+    
   }
+}
+</file>
+
+<file path="server/src/services/script_generator.ts">
+import { GoogleGenAI } from "@google/genai"
+import { config } from "@/utils/config.js"
+
+const ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
+
+export async function generatePodcastScript(topic: string, newsData: string) {
+  const prompt = `
+  You are an expert podcast writer.
+  Write a conversational podcast script between two hosts, "Alex" and "Jamie",
+  about the topic "${topic}". 
+
+  Use the following recent news data as context:
+  ---
+  ${newsData}
+  ---
+
+  The podcast should:
+  - Be 5 to 10 minutes long (approx. 700–1000 words)
+  - Use a natural, dynamic back-and-forth dialogue
+  - Include curiosity hooks, questions, and reactions
+  - Reference the main points accurately
+  - End with a clear takeaway or reflection
+  - Use timestamps or segment headings every 1–2 minutes
+
+  Output ONLY the formatted podcast script. No commentary.
+  `
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+  })
+
+  return response.text ?? "(no script generated)"
+}
+</file>
+
+<file path="server/src/services/web-search.ts">
+import { config } from "@/utils/config.js"
+
+interface SerperOrganicResult {
+  title: string
+  link: string
+  snippet: string
+  date?: string
+}
+
+interface SerperResponse {
+  organic?: SerperOrganicResult[]
+  [key: string]: unknown
+}
+
+interface SearchResult {
+  title: string
+  link: string
+  snippet: string
+  date?: string
+}
+
+export async function searchWeb(query: string, opts?: { num?: number }) {
+  const key = process.env.SERPER_API_KEY || config.SERPER_API_KEY
+  if (!key) {
+    return {
+      provider: "mock",
+      query,
+      results: [
+        {
+          title: "No SERPER_API_KEY set",
+          link: "https://serper.dev",
+          snippet: `Searched for "${query}"`,
+        },
+      ],
+    }
+  }
+
+  const res = await fetch("https://google.serper.dev/search", {
+    method: "POST",
+    headers: {
+      "X-API-KEY": key,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      q: query,
+      num: opts?.num ?? 5,
+      gl: "us",
+      hl: "en",
+      tbs: "qdr:d", // restrict to past day
+    }),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Serper error ${res.status}: ${text}`)
+  }
+
+  const data = (await res.json()) as SerperResponse
+  const results: SearchResult[] =
+    data.organic?.map((r) => ({
+      title: r.title,
+      link: r.link,
+      snippet: r.snippet,
+      date: r.date,
+    })) ?? []
+
+  return { provider: "serper", query, results }
 }
 </file>
 
 <file path="server/src/tests/health.test.ts">
 import { Hono } from "hono"
-import { Orchestrator } from "@/services/orchestrator.js"
 import { createSandbox } from "@/services/sandbox.js"
 import router from "@/routes/podcast.js"
 import { config } from "@/utils/config.js"
+import { Orchestrator } from "@/services/orchestrator.js"
 
 // Simple test runner (no Jest yet)
 async function runTests() {
@@ -1125,7 +1411,7 @@ async function runTests() {
   console.log("→ Creating sandbox...")
   const sandbox = await createSandbox()
   const { stdout } = await sandbox.runCode(`print("sandbox ok")`)
-  console.log("✅ Sandbox responded:", stdout.trim())
+  console.log("✅ Sandbox responded:", Array.isArray(stdout) ? stdout.join("").trim() : stdout.trim())
   await sandbox.close()
 
   // --- ORCHESTRATOR PLAN CHECK ---
@@ -1172,8 +1458,17 @@ export const config = {
   E2B_API_KEY: process.env.E2B_API_KEY || '',
   // Optional:
   ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY || '',
-  TAVILY_API_KEY: process.env.TAVILY_API_KEY || ''
+  // TAVILY_API_KEY: process.env.TAVILY_API_KEY || '',
+  SERPER_API_KEY: process.env.SERPER_API_KEY || '',
 }
+</file>
+
+<file path="server/src/.env.example">
+E2B_API_KEY=your_e2b_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+PORT=3001
+SERPER_API_KEY=your_serper_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
 </file>
 
 <file path="server/src/index.ts">
@@ -1195,12 +1490,33 @@ serve({ fetch: app.fetch, port: config.PORT })
 console.log(`Server running on :${config.PORT}`)
 </file>
 
-<file path="server/.env">
-E2B_API_KEY=e2b_225a512cbf6ab6dc532384e3ef4281da9e541cc6
-GEMINI_API_KEY=AIzaSyDSbG7fng92G5n7ca6FulTDKjPGKAZydCw
-PORT=3001
-ELEVENLABS_API_KEY=...
-TAVILY_API_KEY=...
+<file path="server/.gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.env.local
+.env.*.local
+.env
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 </file>
 
 <file path="server/package.json">
@@ -1253,6 +1569,10 @@ TAVILY_API_KEY=...
   },
   "include": ["src/**/*"]
 }
+</file>
+
+<file path="README.md">
+ai agent web.
 </file>
 
 </files>
