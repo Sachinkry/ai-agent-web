@@ -49,6 +49,7 @@ frontend/
     components/
       ui/
         button.tsx
+        collapsible.tsx
         dialog.tsx
       ChatInterface.tsx
       SandboxPanel.tsx
@@ -93,6 +94,9 @@ server/
       podcast_1761489196357.mp3
       podcast_1761489530367.mp3
       podcast_1761489583982.mp3
+      podcast_1761490757371.mp3
+      podcast_1761491372090.mp3
+      podcast_1761550244575.mp3
   src/
     routes/
       geminiFn.ts
@@ -126,6 +130,111 @@ README.md
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="frontend/src/components/ui/collapsible.tsx">
+import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
+
+function Collapsible({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.Root>) {
+  return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />
+}
+
+function CollapsibleTrigger({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleTrigger>) {
+  return (
+    <CollapsiblePrimitive.CollapsibleTrigger
+      data-slot="collapsible-trigger"
+      {...props}
+    />
+  )
+}
+
+function CollapsibleContent({
+  ...props
+}: React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleContent>) {
+  return (
+    <CollapsiblePrimitive.CollapsibleContent
+      data-slot="collapsible-content"
+      {...props}
+    />
+  )
+}
+
+export { Collapsible, CollapsibleTrigger, CollapsibleContent }
+</file>
+
+<file path="frontend/public/vite.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+</file>
+
+<file path="frontend/src/assets/react.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="frontend/src/components/ui/button.tsx">
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot : "button"
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
+
+export { Button, buttonVariants }
+</file>
 
 <file path="frontend/src/components/ui/dialog.tsx">
 import * as React from "react"
@@ -271,153 +380,6 @@ export {
 }
 </file>
 
-<file path="server/src/services/voice-generator.ts">
-import { config } from "@/utils/config.js"
-import fs from "fs"
-import path from "path"
-
-/**
- * Generates speech using ElevenLabs API.
- * Returns the local file path and base64 string.
- */
-export async function generatePodcastAudio(script: string) {
-  if (!config.ELEVENLABS_API_KEY) {
-    console.warn("[voice] Missing ELEVENLABS_API_KEY – returning mock audio")
-    return {
-      filePath: "mock_podcast.mp3",
-      base64: "",
-      message: "Mock audio (no key set)",
-    }
-  }
-
-  const outputDir = path.join(process.cwd(), "server", "tmp")
-  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true })
-
-  const outputFile = path.join(outputDir, `podcast_${Date.now()}.mp3`)
-
-  const voiceId = "JBFqnCBsd6RMkjVDRZzb" // You can parameterize this later
-
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": config.ELEVENLABS_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text: script,
-        voice_settings: { stability: 0.4, similarity_boost: 0.9 },
-        model_id: "eleven_multilingual_v2",
-      }),
-    }
-  )
-
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`ElevenLabs TTS failed: ${text}`)
-  }
-
-  const arrayBuffer = await res.arrayBuffer()
-  const buffer = Buffer.from(arrayBuffer)
-  fs.writeFileSync(outputFile, buffer)
-
-  const base64 = buffer.toString("base64")
-
-  return {
-    filePath: outputFile,
-    base64,
-    message: "Audio generated successfully",
-  }
-}
-</file>
-
-<file path="server/src/utils/util.ts">
-export function emitFileEvent(opts: { onLog?: (msg: string) => void }, tool: string, filename: string, content: string) {
-    try {
-      const payload = { tool, filename, content }
-      const json = `[FILE] ${JSON.stringify(payload)}`
-      // ✅ Send to frontend
-      opts.onLog?.(json)
-      // ✅ Also confirm in backend console (shortened)
-      console.log(`[DEBUG_EMIT_FILE] ${filename} emitted (${content.slice(0, 50)}...)`)
-    } catch (err) {
-      console.error("[emitFileEvent] Failed to emit file event:", err)
-    }
-  }
-</file>
-
-<file path="frontend/public/vite.svg">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
-</file>
-
-<file path="frontend/src/assets/react.svg">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
-</file>
-
-<file path="frontend/src/components/ui/button.tsx">
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-
-import { cn } from "@/lib/utils"
-
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
-
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
-  const Comp = asChild ? Slot : "button"
-
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
-}
-
-export { Button, buttonVariants }
-</file>
-
 <file path="frontend/src/components/ChatInterface.tsx">
 import { useState } from "react"
 import { Button } from "./ui/button"
@@ -476,70 +438,6 @@ export default function SandboxPanel({ logs }: any) {
       </div>
     )
   }
-</file>
-
-<file path="frontend/src/hooks/useGeminiAgent.ts">
-import { useState } from "react"
-
-export function useGeminiAgent() {
-  const [logs, setLogs] = useState<string[]>([])
-  const [loading, setLoading] = useState(false)
-  const [files, setFiles] = useState<{ tool: string; filename: string; content: string }[]>([])
-
-
-  async function runTask(prompt: string) {
-    setLogs([])
-    setLoading(true)
-    setFiles([])
-
-    const res = await fetch("/api/gemini-fn", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    })
-
-    const reader = res.body?.getReader()
-    const decoder = new TextDecoder()
-    if (!reader) return
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      const chunk = decoder.decode(value)
-      chunk.split("\n").forEach((line) => {
-        if (!line.trim()) return
-        const clean = line.trim()
-
-        if (line.trim().startsWith("[FILE]")) {
-            const raw = line.trim().replace("[FILE]", "").trim()
-            try {
-              const parsed = JSON.parse(raw)
-              if (parsed.filename && parsed.content) {
-                console.log("[UI_DEBUG] Parsed FILE event:", parsed.filename)
-                setFiles((prev) => [
-                  ...prev.filter((f) => f.filename !== parsed.filename),
-                  parsed,
-                ])
-              }
-            } catch (err) {
-              console.error("[UI_DEBUG] Bad FILE JSON line:", raw.slice(0, 200), err)
-            }
-            return // Do not push to logs
-        }
-          
-
-        if (clean.includes("data:audio/mpeg;base64")) return
-        
-
-        setLogs((prev) => [...prev, line])
-      })
-    }
-    setLoading(false)
-  }
-
-  return { logs, loading, runTask, files }
-}
 </file>
 
 <file path="frontend/src/hooks/useOrchestrator.ts">
@@ -635,104 +533,6 @@ export function cn(...inputs: ClassValue[]) {
 
 .read-the-docs {
   color: #888;
-}
-</file>
-
-<file path="frontend/src/App.tsx">
-import { useGeminiAgent } from "./hooks/useGeminiAgent"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-
-export default function App() {
-  const { logs, loading, runTask, files } = useGeminiAgent()
-  const [prompt, setPrompt] = useState("")
-  const [selectedFile, setSelectedFile] = useState<{
-    filename: string
-    content: string
-  } | null>(null)
-
-  return (
-    <div className="flex flex-col items-center h-screen p-8 space-y-4 bg-neutral-950 text-neutral-100">
-      <h1 className="text-2xl font-bold">🔮 Tiny Runnable AI Agent</h1>
-
-      {/* Input Bar */}
-      <div className="flex w-full max-w-3xl space-x-2">
-        <input
-          className="flex-1 border border-neutral-700 bg-neutral-900 rounded px-3 py-2 text-neutral-100"
-          placeholder="Ask Gemini to search or create a podcast..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && runTask(prompt)}
-        />
-        <Button className="bg-rose-500" disabled={loading} onClick={() => runTask(prompt)}>
-          {loading ? "Running..." : "Run"}
-        </Button>
-      </div>
-
-      {/* File List */}
-      {files.length > 0 && (
-        <div
-          className="w-full max-w-3xl border border-neutral-700 rounded-md  bg-neutral-900"
-          // style={{ maxHeight: "70vh", overflowY: "auto" }}
-        >
-          <div className="border-b border-neutral-700 bg-neutral-800 text-sm sticky top-0">
-            <div className="p-2 text-neutral-300 font-semibold">Files</div>
-          </div>
-
-          <div className="divide-y divide-neutral-800">
-            {files.map((f) => (
-              <Dialog key={f.filename}>
-                <DialogTrigger asChild>
-                  <button
-                    onClick={() => setSelectedFile(f)}
-                    className="w-full text-left px-4 py-2 hover:bg-neutral-800 transition-colors"
-                  >
-                    <span className="text-blue-400">{f.filename}</span>
-                    <span className="text-neutral-500 text-xs ml-2">
-                      ({f.tool})
-                    </span>
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-neutral-950 text-neutral-100 border-neutral-700">
-                  <DialogHeader>
-                    <DialogTitle>{f.filename}</DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-2 font-mono text-xs whitespace-pre-wrap bg-neutral-900 border border-neutral-800 p-3 rounded-md">
-                  {f.filename.endsWith(".mp3") ? (
-                      <audio controls src={f.content} className="w-full mt-2" />
-                    ) : f.filename.endsWith(".json") ? (
-                      JSON.stringify(f.content, null, 2)
-                    ) : (
-                      f.content
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Logs Terminal */}
-      <div
-        className="bg-black text-green-400 font-mono p-4 rounded-lg w-full max-w-3xl overflow-y-auto whitespace-pre-wrap border border-neutral-800"
-        style={{ maxHeight: "70vh" }}
-      > {!logs || logs.length === 0 ? (
-        <div className="text-green-500">Sandbox. Logs will appear here...</div>
-      ) : ""}
-        {logs && logs.map((log, i) => (
-          <div className="text-wrap" key={i}>{log.length > 1000 ? log.slice(0, 1000) + '…' : log}</div>
-        ))}
-      </div>
-    </div>
-  )
 }
 </file>
 
@@ -968,48 +768,6 @@ export default defineConfig([
 </html>
 </file>
 
-<file path="frontend/package.json">
-{
-  "name": "frontend",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@tailwindcss/vite": "^4.1.16",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.548.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.16"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@types/node": "^24.6.0",
-    "@types/react": "^19.1.16",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.0.4",
-    "eslint": "^9.36.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.22",
-    "globals": "^16.4.0",
-    "tw-animate-css": "^1.4.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.45.0",
-    "vite": "^7.1.7"
-  }
-}
-</file>
-
 <file path="frontend/README.md">
 # React + TypeScript + Vite
 
@@ -1172,32 +930,6 @@ export default defineConfig([
 }
 </file>
 
-<file path="frontend/vite.config.ts">
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
-
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  server: {
-    port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://localhost:3001", // your Hono server
-        changeOrigin: true,
-      },
-    },
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-})
-</file>
-
 <file path="server/src/routes/geminiFn.ts">
 import { Orchestrator } from "@/services/orchestrator.js"
 import { Hono } from "hono"
@@ -1278,288 +1010,6 @@ router.post("/api/task", async (c) => {
 export default router
 </file>
 
-<file path="server/src/services/gemini-tools.ts">
-import { Type } from "@google/genai"
-
-export const runPythonTool = {
-  name: "run_python_in_sandbox",
-  description:
-    "Executes Python code safely in a remote sandbox and returns stdout/stderr.",
-  parameters: {
-    type: Type.OBJECT,
-    properties: {
-      code: {
-        type: Type.STRING,
-        description: "Python code to execute inside sandbox",
-      },
-    },
-    required: ["code"],
-  },
-}
-
-export const searchWebTool = {
-  name: "search_web",
-  description:
-    "Search the live web for recent info. Use for news, updates, or when the user asks for 'latest'. Returns concise results.",
-  parameters: {
-    type: Type.OBJECT,
-    properties: {
-      query: { type: Type.STRING, description: "Search query string" },
-      max_results: {
-        type: Type.NUMBER,
-        description: "Max number of results (1-10)",
-      },
-    },
-    required: ["query"],
-  },
-}
-
-export const generatePodcastScriptTool = {
-    name: "generate_podcast_script",
-    description:
-      "Takes recent news search results and writes an engaging 5-10 minute podcast script with 2 speakers.",
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        topic: {
-          type: Type.STRING,
-          description: "The main topic or theme of the podcast",
-        },
-        news_data: {
-          type: Type.STRING,
-          description:
-            "Concatenated or summarized news articles from the web search",
-        },
-      },
-      required: ["topic", "news_data"],
-    },
-  }
-  
-  export const generateVoiceTool = {
-    name: "generate_voice",
-    description:
-      "Converts the podcast script into spoken audio using ElevenLabs text-to-speech.",
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        script: {
-          type: Type.STRING,
-          description: "Podcast script text to convert to speech",
-        },
-        voice: {
-          type: Type.STRING,
-          description: "Voice name or ID to use (default: Rachel)",
-        },
-      },
-      required: ["script"],
-    },
-  }
-</file>
-
-<file path="server/src/services/orchestrator.ts">
-import { GoogleGenAI } from "@google/genai"
-import { config } from "@/utils/config.js"
-import { createSandbox } from "./sandbox.js"
-import { generatePodcastScriptTool, generateVoiceTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
-import { searchWeb } from "./web-search.js"
-import { generatePodcastScript } from "./script_generator.js"
-import { generatePodcastAudio } from "./voice-generator.js"
-import { emitFileEvent } from "@/utils/util.js"
-
-export class Orchestrator {
-  private ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
-
-  // Stub event system preserved for compatibility with /api/task route
-  on(_event: string, _callback: (...args: any[]) => void) {
-    // no-op; you can implement EventEmitter if needed later
-  }
-
-  async plan(prompt: string) {
-    // Keep your stub plan
-    return ["Analyze Task", "Search News", "Generate Script"]
-  }
-
-  safePreview = (v: any, max = 400) => {
-    const s = typeof v === "string" ? v : JSON.stringify(v)
-    return s.length > max ? s.slice(0, max) + "..." : s
-  }
-  
-  /**
-   * One-call streaming orchestration with function-calling.
-   * Supports multiple tool calls in sequence (search → python → finalize).
-   */
-  async executeWithFunctionCalling(
-    prompt: string,
-    opts?: { onLog?: (msg: string) => void }
-  ) {
-    const log = (m: string) => opts?.onLog?.(m)
-
-    // Running conversation state
-    const contents: any[] = [{ role: "user", parts: [{ text: prompt }] }]
-    const tools = [{ functionDeclarations: [
-      runPythonTool, 
-      searchWebTool, 
-      generatePodcastScriptTool,
-      generateVoiceTool
-    ] }]
-
-    log?.(`[STEP] Sending prompt to Gemini...`)
-    let response = await this.ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents,
-      config: { tools },
-    })
-
-    // Loop to satisfy multiple tool calls if the model wants them
-    for (let safety = 0; safety < 4; safety++) {
-      const fn = response.functionCalls?.[0]
-
-      // No tool call – return text.
-      if (!fn) {
-        log?.(`[DONE] Gemini text-only response.`)
-        return response.text ?? "(no text)"
-      }
-
-      // Handle the tool call
-      log?.(`[FUNC] ${fn.name}`)
-      log?.(`[ARGS] ${this.safePreview(fn.args, 400)}`)
-
-
-      if (fn.name === "run_python_in_sandbox") {
-        const code = (fn.args as Record<string, any>).code
-        log?.(`[CODE] ${code}`)
-
-        const sandbox = await createSandbox()
-        log?.(`[E2B] Sandbox started`)
-
-        const result = await sandbox.runCode(code)
-        await sandbox.close()
-        log?.(`[E2B_RESULT] ${JSON.stringify(result)}`)
-
-        // Feed function response back
-        const functionResponsePart = {
-          name: fn.name,
-          response: { result },
-        }
-        const candidateContent = response.candidates?.[0]?.content
-        if (candidateContent) contents.push(candidateContent)
-        contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
-
-      } else if (fn.name === "search_web") {
-        const { query, max_results } = fn.args as Record<string, any>
-        log?.(`[SEARCH] ${query}`)
-        try {
-          const result = await searchWeb(query, { max_results })
-          // log?.(`[SEARCH_RESULT] ${JSON.stringify(result).slice(0, 800)}...`)
-          
-          opts?.onLog?.(`[FILE] {"tool":"search_web","filename":"search_result.json","content":${JSON.stringify(result)}}`)
-
-
-          const functionResponsePart = {
-            name: fn.name,
-            response: result,
-          }
-          const candidateContent = response.candidates?.[0]?.content
-          if (candidateContent) contents.push(candidateContent)
-          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
-        } catch (err: any) {
-          log?.(`[ERROR] search_web: ${err?.message || String(err)}`)
-          const functionResponsePart = {
-            name: fn.name,
-            response: { error: String(err) },
-          }
-          const candidateContent = response.candidates?.[0]?.content
-          if (candidateContent) contents.push(candidateContent)
-          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
-        }
-
-      } else if (fn.name === "generate_podcast_script") {
-        const { topic, news_data } = fn.args as Record<string, any>
-        log?.(`[SCRIPT] Generating podcast for topic: ${topic}`)
-      
-        try {
-          const script = await generatePodcastScript(topic, news_data)
-          // log?.(`[SCRIPT_DONE] Script generated (${script.length} chars)`)
-          opts?.onLog?.(`[FILE] {"tool":"generate_podcast_script","filename":"podcast_script.txt","content":${JSON.stringify(script)}}`)
-
-      
-          const functionResponsePart = {
-            name: fn.name,
-            response: { script },
-          }
-      
-          const candidateContent = response.candidates?.[0]?.content
-          if (candidateContent) contents.push(candidateContent)
-          contents.push({
-            role: "user",
-            parts: [{ functionResponse: functionResponsePart } as any],
-          })
-        } catch (err: any) {
-          log?.(`[ERROR] generate_podcast_script: ${err?.message || String(err)}`)
-          const functionResponsePart = {
-            name: fn.name,
-            response: { error: String(err) },
-          }
-          const candidateContent = response.candidates?.[0]?.content
-          if (candidateContent) contents.push(candidateContent)
-          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
-        }
-      } else if (fn.name === "generate_voice") {
-        const { script, voice } = fn.args as Record<string, any>
-        log?.(`[VOICE] Generating podcast audio using ElevenLabs...`)
-      
-        try {
-          const result = await generatePodcastAudio(script)
-          log?.(`[VOICE_DONE] Audio generated (${result.filePath})`)
-      
-          // Stream audio file to the frontend only (NOT into Gemini context)
-          const base64Prefix = "data:audio/mpeg;base64,"
-          // if (opts) {
-            emitFileEvent(opts!, "generate_voice", "podcast_audio.mp3", `${base64Prefix}${result.base64}`)
-          // }
-          
-          // Minimal functionResponse back to Gemini (NO base64)
-          const functionResponsePart = {
-            name: fn.name,
-            response: {
-              success: true,
-              message: result.message,
-              filename: "podcast_audio.mp3",
-            },
-          }
-          const candidateContent = response.candidates?.[0]?.content
-          if (candidateContent) contents.push(candidateContent)
-          contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
-        } catch (err: any) {
-          log?.(`[ERROR] generate_voice: ${err?.message || String(err)}`)
-        }
-      }
-         
-      else {
-        log?.(`[ERROR] Unknown function call: ${fn.name}`)
-        const functionResponsePart = {
-          name: fn.name,
-          response: { error: `Unknown function call: ${fn.name}` },
-        }
-        const candidateContent = response.candidates?.[0]?.content
-        if (candidateContent) contents.push(candidateContent)
-        contents.push({ role: "user", parts: [{ functionResponse: functionResponsePart } as any] })
-      }
-
-      // Ask model to proceed (it may call more tools or produce final text)
-      response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents,
-        config: { tools },
-      })
-    }
-
-    // Fallback in case of tool loop overflow
-    return response.text ?? "(no final.text)"
-  }
-}
-</file>
-
 <file path="server/src/services/sandbox.ts">
 import { Sandbox } from "@e2b/code-interpreter"
 import { config } from "@/utils/config.js"
@@ -1629,6 +1079,71 @@ export async function generatePodcastScript(topic: string, newsData: string) {
   })
 
   return response.text ?? "(no script generated)"
+}
+</file>
+
+<file path="server/src/services/voice-generator.ts">
+import { config } from "@/utils/config.js"
+import fs from "fs"
+import path from "path"
+
+/**
+ * Generates speech using ElevenLabs API.
+ * Returns the local file path and a relative URL.
+ */
+export async function generatePodcastAudio(script: string) {
+  if (!config.ELEVENLABS_API_KEY) {
+    console.warn("[voice] Missing ELEVENLABS_API_KEY – returning mock audio")
+    return {
+      filePath: "mock_podcast.mp3",
+      urlPath: "", // <-- Add mock urlPath
+      base64: "",
+      message: "Mock audio (no key set)",
+    }
+  }
+
+  const outputDir = path.join(process.cwd(), "server", "tmp")
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true })
+
+  const filename = `podcast_${Date.now()}.mp3` // <-- 1. Store filename
+  const outputFile = path.join(outputDir, filename) // <-- 2. Use filename
+  const urlPath = `/tmp/${filename}` // <-- 3. Create relative URL
+
+  const voiceId = "JBFqnCBsd6RMkjVDRZzb" // You can parameterize this later
+
+  const res = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": config.ELEVENLABS_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: script,
+        voice_settings: { stability: 0.4, similarity_boost: 0.9 },
+        model_id: "eleven_multilingual_v2",
+      }),
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`ElevenLabs TTS failed: ${text}`)
+  }
+
+  const arrayBuffer = await res.arrayBuffer()
+  const buffer = Buffer.from(arrayBuffer)
+  fs.writeFileSync(outputFile, buffer)
+
+  // const base64 = buffer.toString("base64") // No longer needed
+
+  return {
+    filePath: outputFile,
+    urlPath: urlPath, // <-- 4. Return the URL path
+    base64: "", // <-- 5. Don't need to send base64
+    message: "Audio generated successfully",
+  }
 }
 </file>
 
@@ -1775,31 +1290,27 @@ export const config = {
 }
 </file>
 
+<file path="server/src/utils/util.ts">
+export function emitFileEvent(opts: { onLog?: (msg: string) => void }, tool: string, filename: string, content: string) {
+    try {
+      const payload = { tool, filename, content }
+      const json = `[FILE] ${JSON.stringify(payload)}`
+      // ✅ Send to frontend
+      opts.onLog?.(json)
+      // ✅ Also confirm in backend console (shortened)
+      console.log(`[DEBUG_EMIT_FILE] ${filename} emitted (${content.slice(0, 50)}...)`)
+    } catch (err) {
+      console.error("[emitFileEvent] Failed to emit file event:", err)
+    }
+  }
+</file>
+
 <file path="server/src/.env.example">
 E2B_API_KEY=your_e2b_api_key_here
 GEMINI_API_KEY=your_gemini_api_key_here
 PORT=3001
 SERPER_API_KEY=your_serper_api_key_here
 ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
-</file>
-
-<file path="server/src/index.ts">
-import { Hono } from "hono"
-import { serve } from "@hono/node-server"
-import { cors } from "hono/cors"
-import router from "./routes/podcast.js"
-import { config } from "./utils/config.js"
-import health from "./routes/health.js"
-import geminiFn from "./routes/geminiFn.js"
-
-const app = new Hono()
-app.use("/*", cors({ origin: "*", credentials: false }))
-
-app.route("/", router)
-app.route("/", health)
-app.route("/", geminiFn)
-serve({ fetch: app.fetch, port: config.PORT })
-console.log(`Server running on :${config.PORT}`)
 </file>
 
 <file path="server/.gitignore">
@@ -1885,6 +1396,603 @@ dist-ssr
 
 <file path="README.md">
 ai agent web.
+</file>
+
+<file path="frontend/src/hooks/useGeminiAgent.ts">
+import { useState } from "react"
+
+export function useGeminiAgent() {
+  const [logs, setLogs] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [files, setFiles] = useState<{ tool: string; filename: string; content: string }[]>([])
+
+
+  async function runTask(prompt: string) {
+    setLogs([])
+    setLoading(true)
+    setFiles([])
+
+    const res = await fetch("/api/gemini-fn", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    })
+
+    const reader = res.body?.getReader()
+    const decoder = new TextDecoder()
+    if (!reader) return
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      const chunk = decoder.decode(value)
+      chunk.split("\n").forEach((line) => {
+        // if (!line.trim()) return // <--- 1. REMOVE THIS LINE
+        const clean = line.trim() // We'll use this for checks
+
+        if (clean.startsWith("[FILE]")) { // <--- 2. Check against 'clean'
+            const raw = clean.replace("[FILE]", "").trim()
+            try {
+              const parsed = JSON.parse(raw)
+              if (parsed.filename && parsed.content) {
+                console.log("[UI_DEBUG] Parsed FILE event:", parsed.filename)
+                setFiles((prev) => [
+                  ...prev.filter((f) => f.filename !== parsed.filename),
+                  parsed,
+                ])
+              }
+            } catch (err) {
+              console.error("[UI_DEBUG] Bad FILE JSON line:", raw.slice(0, 200), err)
+            }
+            return // Do not push to logs
+        }
+          
+        // Push the original 'line' to preserve whitespace and empty lines
+        setLogs((prev) => [...prev, line])
+      })
+    }
+    setLoading(false)
+  }
+
+  return { logs, loading, runTask, files }
+}
+</file>
+
+<file path="frontend/src/App.tsx">
+import { useGeminiAgent } from "./hooks/useGeminiAgent"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { ChevronsUpDown, Check } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+
+export default function App() {
+  const { logs, loading, runTask, files } = useGeminiAgent()
+  const [prompt, setPrompt] = useState("")
+  const [selectedFile, setSelectedFile] = useState<{
+    filename: string
+    content: string
+  } | null>(null)
+
+  const completeIndex = logs.findIndex((log) => log.startsWith("[COMPLETE]"))
+
+  let finalOutput: string | null = null
+  let runLogs: string[] = logs // Default to all logs
+
+  if (completeIndex !== -1) {
+    // If [COMPLETE] is found:
+    // 1. Get all log entries *from* that index to the end
+    const outputLines = logs.slice(completeIndex)
+
+    // 2. Join them back together with newlines
+    // 3. Remove the [COMPLETE] prefix from the first line
+    finalOutput = outputLines
+      .join("\n")
+      .replace("[COMPLETE]", "")
+      .trim()
+    
+    // 4. Run logs are everything *before* that index
+    runLogs = logs.slice(0, completeIndex)
+  }
+
+  return (
+    <div className="flex flex-col items-center min-h-screen p-8 space-y-4 bg-neutral-950 text-neutral-100">
+      <h1 className="text-2xl font-bold">🔮 Tiny Runnable AI Agent</h1>
+
+      {/* Input Bar */}
+      <div className="flex w-full max-w-3xl space-x-2">
+        <input
+          className="flex-1 border border-neutral-700 bg-neutral-900 rounded px-3 py-2 text-neutral-100"
+          placeholder="Ask Gemini to search or create a podcast..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && runTask(prompt)}
+        />
+        <Button
+          className="bg-rose-500"
+          disabled={loading}
+          onClick={() => runTask(prompt)}
+        >
+          {loading ? "Running..." : "Run"}
+        </Button>
+      </div>
+
+      {/* File List */}
+      {files.length > 0 && (
+        <div
+          className="w-full max-w-3xl border border-neutral-700 rounded-md  bg-neutral-900"
+        >
+          <div className="border-b border-neutral-700 bg-neutral-800 text-sm sticky top-0">
+            <div className="p-2 text-neutral-300 font-semibold">Files</div>
+          </div>
+
+          <div className="divide-y divide-neutral-800">
+            {files.map((f) => (
+              <Dialog key={f.filename}>
+                <DialogTrigger asChild>
+                  <button
+                    onClick={() => setSelectedFile(f)}
+                    className="w-full text-left px-4 py-2 hover:bg-neutral-800 transition-colors"
+                  >
+                    <span className="text-blue-400">{f.filename}</span>
+                    <span className="text-neutral-500 text-xs ml-2">
+                      ({f.tool})
+                    </span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-neutral-950 text-neutral-100 border-neutral-700">
+                  <DialogHeader>
+                    <DialogTitle>{f.filename}</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-2 font-mono text-xs whitespace-pre-wrap bg-neutral-900 border border-neutral-800 p-3 rounded-md">
+                    {f.filename.endsWith(".mp3") ? (
+                      <audio controls src={f.content} className="w-full mt-2" />
+                    ) : f.filename.endsWith(".json") ? (
+                      JSON.stringify(f.content, null, 2)
+                    ) : (
+                      f.content
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Logs Terminal (Collapsible) */}
+      {(logs.length > 0 || loading) && (
+        <Collapsible defaultOpen={false} className="w-full max-w-3xl">
+          <CollapsibleTrigger asChild>
+            <button className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-left border rounded-md border-neutral-700 bg-neutral-900 hover:bg-neutral-800 data-[state=open]:rounded-b-none">
+              <span>{loading ? "View Live Logs..." : "View Full Logs"}</span>
+              <ChevronsUpDown className="size-4" />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div
+              className="bg-black text-green-400 font-mono p-4 rounded-b-lg w-full max-w-3xl overflow-y-auto whitespace-pre-wrap border border-neutral-800 border-t-0"
+              style={{ maxHeight: "50vh" }}
+            >
+              {runLogs.length === 0 && loading ? (
+                <div className="text-green-500">
+                  Sandbox logs will appear here...
+                </div>
+              ) : runLogs.length === 0 && !loading ? (
+                <div className="text-green-500">No logs for this run.</div>
+              ) : (
+                runLogs.map((log, i) => (
+                  <div className="text-wrap" key={i}>
+                    {log.length > 1000 ? log.slice(0, 1000) + "…" : log}
+                  </div>
+                ))
+              )}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {/* Final Output Box */}
+      {finalOutput && !loading && (
+        <div className="w-full max-w-3xl p-4 space-y-2 bg-neutral-900 border border-neutral-700 rounded-lg">
+          <div className="flex items-center gap-2 text-lg font-semibold text-green-400">
+            <Check className="size-5" />
+            Result
+          </div>
+          <div className="pl-7 text-neutral-100 text-sm">
+          <ReactMarkdown
+            components={{
+              ul: ({ node, ...props }) => (
+                <ul
+                  className="list-disc list-outside pl-5 space-y-1"
+                  {...props}
+                />
+              ),
+              ol: ({ node, ...props }) => (
+                <ol
+                  className="list-decimal list-outside pl-5 space-y-1"
+                  {...props}
+                />
+              ),
+              p: ({ node, ...props }) => <p className="mb-2" {...props} />,
+            }}
+          >
+            {finalOutput}
+          </ReactMarkdown>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="frontend/package.json">
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tailwindcss/vite": "^4.1.16",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.548.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.16"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@types/node": "^24.6.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.45.0",
+    "vite": "^7.1.7"
+  }
+}
+</file>
+
+<file path="frontend/vite.config.ts">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3001", // your Hono server
+        changeOrigin: true,
+      },
+      "/tmp": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+})
+</file>
+
+<file path="server/src/services/gemini-tools.ts">
+import { Type } from "@google/genai"
+
+export const runPythonTool = {
+  name: "run_python_in_sandbox",
+  description:
+    "Executes Python code safely in a remote sandbox and returns stdout/stderr.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      code: {
+        type: Type.STRING,
+        description: "Python code to execute inside sandbox",
+      },
+    },
+    required: ["code"],
+  },
+}
+
+export const searchWebTool = {
+  name: "search_web",
+  description:
+    "Search the live web for recent info. Use for news, updates, or when the user asks for 'latest'. Returns concise results.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: { type: Type.STRING, description: "Search query string" },
+      max_results: {
+        type: Type.NUMBER,
+        description: "Max number of results (1-10)",
+      },
+    },
+    required: ["query"],
+  },
+}
+
+export const generatePodcastScriptTool = {
+    name: "generate_podcast_script",
+    description:
+      "Takes recent news search results and writes an engaging 5-10 minute podcast script with 2 speakers.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        topic: {
+          type: Type.STRING,
+          description: "The main topic or theme of the podcast",
+        },
+        news_data: {
+          type: Type.STRING,
+          description:
+            "Concatenated or summarized news articles from the web search",
+        },
+      },
+      required: ["topic", "news_data"],
+    },
+  }
+  
+  export const generateVoiceTool = {
+    name: "generate_voice",
+    description:
+      "Converts the podcast script into spoken audio using ElevenLabs text-to-speech.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        script: {
+          type: Type.STRING,
+          description: "Podcast script text to convert to speech",
+        },
+        voice: {
+          type: Type.STRING,
+          description: "Voice name or ID to use (default: Rachel)",
+        },
+      },
+      required: ["script"],
+    },
+  }
+</file>
+
+<file path="server/src/services/orchestrator.ts">
+import { GoogleGenAI } from "@google/genai"
+import { config } from "@/utils/config.js"
+import { createSandbox } from "./sandbox.js"
+import { generatePodcastScriptTool, generateVoiceTool, runPythonTool, searchWebTool } from "./gemini-tools.js"
+import { searchWeb } from "./web-search.js"
+import { generatePodcastScript } from "./script_generator.js"
+import { generatePodcastAudio } from "./voice-generator.js"
+import { emitFileEvent } from "@/utils/util.js"
+
+export class Orchestrator {
+  private ai = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
+
+  private toolRegistry: Map<string, (args: any, opts: any) => Promise<any>>
+
+  constructor() {
+    this.toolRegistry = new Map()
+    this.toolRegistry.set("search_web", this.handleSearchWeb)
+    this.toolRegistry.set("generate_podcast_script", this.handleGenerateScript)
+    this.toolRegistry.set("generate_voice", this.handleGenerateVoice)
+    this.toolRegistry.set("run_python_in_sandbox", this.handleRunPython)
+  }
+
+  private async handleSearchWeb(args: { query: string, max_results: number }, opts: { onLog?: (msg: string) => void }) {
+    opts.onLog?.(`[SEARCH] ${args.query}`)
+    const result = await searchWeb(args.query, { max_results: args.max_results })
+    
+    // Emit the file for the UI
+    opts.onLog?.(`[FILE] {"tool":"search_web","filename":"search_result.json","content":${JSON.stringify(result)}}`)
+    
+    // Return the result for Gemini
+    return result
+  }
+
+  private async handleGenerateScript(args: { topic: string, news_data: string }, opts: { onLog?: (msg: string) => void }) {
+    opts.onLog?.(`[SCRIPT] Generating podcast for topic: ${args.topic}`)
+    const script = await generatePodcastScript(args.topic, args.news_data)
+    
+    opts.onLog?.(`[FILE] {"tool":"generate_podcast_script","filename":"podcast_script.txt","content":${JSON.stringify(script)}}`)
+    
+    return { script } // Return what Gemini needs
+  }
+  
+  private async handleGenerateVoice(args: { script: string, voice: string }, opts: { onLog?: (msg: string) => void }) {
+    opts.onLog?.(`[VOICE] Generating podcast audio...`)
+    const result = await generatePodcastAudio(args.script)
+    
+    // Emit the file (URL) for the UI
+    emitFileEvent(opts!, "generate_voice", "podcast_audio.mp3", result.urlPath)
+    
+    // Return a minimal response for Gemini
+    return { success: true, message: result.message, filename: "podcast_audio.mp3" }
+  }
+  
+  private async handleRunPython(args: { code: string }, opts: { onLog?: (msg: string) => void }) {
+    opts.onLog?.(`[CODE] ${args.code}`)
+    const sandbox = await createSandbox()
+    opts.onLog?.(`[E2B] Sandbox started`)
+    const result = await sandbox.runCode(args.code)
+    await sandbox.close()
+    opts.onLog?.(`[E2B_RESULT] ${JSON.stringify(result)}`)
+    return result
+  }
+
+  // Stub event system preserved for compatibility with /api/task route
+  on(_event: string, _callback: (...args: any[]) => void) {
+    // no-op; you can implement EventEmitter if needed later
+  }
+
+  async plan(prompt: string) {
+    // Keep your stub plan
+    return ["Analyze Task", "Search News", "Generate Script"]
+  }
+
+  safePreview = (v: any, max = 400) => {
+    const s = typeof v === "string" ? v : JSON.stringify(v)
+    return s.length > max ? s.slice(0, max) + "..." : s
+  }
+  
+  async executeWithFunctionCalling(
+    prompt: string,
+    opts?: { onLog?: (msg: string) => void }
+  ) {
+    const log = (m: string) => opts?.onLog?.(m)
+
+    log?.(`[STEP] Generating plan...`)
+    try {
+      const planPrompt = `You are a helpful AI assistant. Based on the user's request, please outline a brief, step-by-step plan of which tools you will use to accomplish the goal. Do not use any tools yet, just provide the text-based plan.
+      
+      User Request: "${prompt}"
+      
+      Example Plan:
+      1. Search the web for the requested topic using the 'search_web' tool.
+      2. Generate a podcast script based on the search results using 'generate_podcast_script'.
+      3. Convert the script to audio using 'generate_voice'.
+      4. Present the final audio file to the user.`
+
+      const planResponse = await this.ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: planPrompt }] }],
+        // We provide NO tools here, forcing a text response
+        config: { tools: [] }, 
+      })
+
+      const planText = planResponse.text ?? "No plan could be generated."
+      log?.(`[PLAN] \n${planText}`)
+
+    } catch (err: any) {
+      log?.(`[ERROR] Failed to generate plan: ${err.message}`)
+    }
+    const contents: any[] = [{ role: "user", parts: [{ text: prompt }] }]
+    
+    // --- 3. GET TOOL DEFINITIONS DYNAMICALLY ---
+    const tools = [{ functionDeclarations: [
+      runPythonTool, 
+      searchWebTool, 
+      generatePodcastScriptTool,
+      generateVoiceTool
+    ] }]
+
+    log?.(`[STEP] Sending prompt to Gemini...`)
+    let response = await this.ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents,
+      config: { tools },
+    })
+
+    for (let safety = 0; safety < 4; safety++) {
+      const fn = response.functionCalls?.[0]
+      if (!fn) {
+        log?.(`[DONE] Gemini text-only response.`)
+        return response.text ?? "(no text)"
+      }
+
+      log?.(`[FUNC] ${fn.name}`)
+      log?.(`[ARGS] ${this.safePreview(fn.args, 400)}`)
+
+      // --- 4. DYNAMIC DISPATCH ---
+      // (This replaces your entire if/else block)
+      
+      let functionResult: any
+      if (fn.name && this.toolRegistry.has(fn.name)) {
+        try {
+          const toolHandler = this.toolRegistry.get(fn.name)!
+          // Pass 'opts' so handlers can log and emit files
+          const result = await toolHandler(fn.args, opts) 
+          functionResult = {
+            name: fn.name,
+            response: result,
+          }
+        } catch (err: any) {
+          log?.(`[ERROR] ${fn.name}: ${err?.message || String(err)}`)
+          functionResult = {
+            name: fn.name,
+            response: { error: String(err) },
+          }
+        }
+      } else {
+        log?.(`[ERROR] Unknown function call: ${fn.name}`)
+        functionResult = {
+          name: fn.name,
+          response: { error: `Unknown function call: ${fn.name}` },
+        }
+      }
+      // --- END OF DYNAMIC DISPATCH ---
+
+      const candidateContent = response.candidates?.[0]?.content
+      if (candidateContent) contents.push(candidateContent)
+      contents.push({ role: "user", parts: [{ functionResponse: functionResult } as any] })
+
+      response = await this.ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents,
+        config: { tools },
+      })
+    }
+
+    return response.text ?? "(no final.text)"
+  }
+}
+</file>
+
+<file path="server/src/index.ts">
+import { Hono } from "hono"
+import { serve } from "@hono/node-server"
+import { cors } from "hono/cors"
+import router from "./routes/podcast.js"
+import { config } from "./utils/config.js"
+import health from "./routes/health.js"
+import geminiFn from "./routes/geminiFn.js"
+import { serveStatic } from "@hono/node-server/serve-static"
+
+const app = new Hono()
+app.use("/*", cors({ origin: "*", credentials: false }))
+
+app.use("/tmp/*", serveStatic({ root: "./server" }))
+
+app.route("/", router)
+app.route("/", health)
+app.route("/", geminiFn)
+serve({ fetch: app.fetch, port: config.PORT })
+console.log(`Server running on :${config.PORT}`)
 </file>
 
 </files>

@@ -27,10 +27,11 @@ export function useGeminiAgent() {
 
       const chunk = decoder.decode(value)
       chunk.split("\n").forEach((line) => {
-        if (!line.trim()) return
+        // if (!line.trim()) return // <--- 1. REMOVE THIS LINE
+        const clean = line.trim() // We'll use this for checks
 
-        if (line.trim().startsWith("[FILE]")) {
-            const raw = line.trim().replace("[FILE]", "").trim()
+        if (clean.startsWith("[FILE]")) { // <--- 2. Check against 'clean'
+            const raw = clean.replace("[FILE]", "").trim()
             try {
               const parsed = JSON.parse(raw)
               if (parsed.filename && parsed.content) {
@@ -46,9 +47,7 @@ export function useGeminiAgent() {
             return // Do not push to logs
         }
           
-
-        
-
+        // Push the original 'line' to preserve whitespace and empty lines
         setLogs((prev) => [...prev, line])
       })
     }

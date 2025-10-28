@@ -74,3 +74,19 @@ export const generatePodcastScriptTool = {
     },
   }
   
+export const finalAnswerTool = {
+    name: "final_answer",
+    description:
+      "Call this tool ONLY when you have the final answer to the user's request and no further tool calls are needed.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        answer: {
+          type: Type.STRING,
+          description:
+            "The final, comprehensive answer to the user's original request, based on your analysis and tool usage.",
+        },
+      },
+      required: ["answer"],
+    },
+  };
